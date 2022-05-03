@@ -1,0 +1,46 @@
+---
+title: "Log of comments"
+author: "DG"
+date: '2022-05-03'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```
+---------- Forwarded message ---------
+From: Jason Morphett <onmas59@gmail.com>
+Date: Tue, Apr 19, 2022 at 4:32 AM
+Subject: Abstractor (latest)
+To: Dmitry O. Gorodnichy <dmitry.gorodnichy@gmail.com>, Marek Pawlewski <marek@pawlewski.com>, <oliver-schubert4@gmx.de>
+
+
+Hi Dmitry/everyone,
+
+I've created a zip file with all files required to run Abstractor locally (and disabled any database access as I don't want to share my credentials obviously :).  
+
+The main change is that I've re-written how search works (but don't worry).  I know you have been assuming I search one line at a time, but whilst extracting text using OCR where the pdf was an image file, it seemed a better idea to capture ALL pdf text from all files in a single CSV and search one page at a time.  This will be a problem later, but for now is ok.
+
+This CSV is called 'corpus.csv' (or 'corpus-staging.csv' in the zip file) and has three columns.  The first is a modified version of the filename I use internally.  You don't need to worry about this.  The second column is the pdf page number and the third column is the pdf page text.  So searches are now done per page (I saw little value in identifying a line number etc.).  This also allows me to keep all text in one place.  I realise searching is still O(n), but its fast enough and a couple of orders of magnitude faster than reading in each of the pdfs over the network as I was doing before.
+
+When you run it, search for words like 'Female' or something that Abstractor will actually find in corpus-staging.csv.  Its just for testing/running locally.
+
+Also, the last Row for each pdf is the pdf's URL - that's just a decision I had to make on where to encode the link to the file when search results are presented back in the table.
+
+I broke out my R pdf 'search' function into a separate file called search.R that gets called when the 'Search' button (or 'Enter') is pressed.  It takes a couple of inputs:
+
+corp.us - A data frame I read in near the top of app.R from corpus-staging.csv
+sourc.es - A data frame I create near the top of app.R which holds pdf-->URLs
+srch.term - The keyword (e.g. 'Female') to search
+off.set=50 - The number of characters +/- around the keyword in the results extract
+
+I hope this makes sense.  Happy to have a call (tomorrow is fine) to discuss this if you want.
+
+Kind regards,
+Jason
+
+```
