@@ -12,6 +12,8 @@ library(shinybusy)
 library(shinyalert)
 library(DT)
 
+library(data.table) # replaced CNTR+F data.frame with data.table
+
 # Wordclouds
 # SEE: https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
 library(wordcloud)
@@ -44,7 +46,16 @@ library(readr)
 # DATA
 # Read in the corpus
 # User readr version of read_csv to handle EOF in quoted strings
-PFIZER.CORPUS <- readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE)
+
+# PFIZER.CORPUS <- readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE)
+# Error in readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE) : 
+#   unused argument (show_col_types = FALSE)
+
+# PFIZER.CORPUS <- data.table("corpus-staging.csv")
+
+PFIZER.CORPUS <- read_csv("corpus-staging.csv")
+
+
 PFIZER.SOURCES <- PFIZER.CORPUS  %>%
   group_by(filename) %>%
   filter(page_num == max(as.numeric(page_num))) 
@@ -124,7 +135,7 @@ ui <- fluidPage(
                       tags$script(type="text/javascript", src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55a2c0ea679e0df1"),
   
                       # Google Analytics
-                      tags$head(includeHTML(("google-analytics.html"))),
+                      # tags$head(includeHTML(("google-analytics.html"))),
 
                       tags$head(tags$link(rel="shortcut icon", href="favicon/database-32-171970.png", sizes="16x16")),
                       tags$head(tags$link(rel="shortcut icon", href="favicon/database-32-171970.png", sizes="32x32")),

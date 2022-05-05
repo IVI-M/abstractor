@@ -1,0 +1,83 @@
+---
+title: "PDF Searching Keywords and Extracting Tables (R and Python)"
+author: "Oliver"
+date: "28 3 2022"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(pdftools)
+library(pdfsearch)
+library(tidyverse)
+library(reticulate)
+```
+
+
+# Using pdftools
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#Path
+directory <- 'C:\\Users\\Oliver\\Documents\\myrepo\\pd-production-030122'
+
+result <- 
+    keyword_directory(directory
+                      ,keyword = c('HIV')
+                      ,surround_lines = 1
+                      ,full_names = TRUE)
+
+pdf_grouped <- result %>% 
+    select(pdf_name, keyword) %>% 
+    group_by(pdf_name, keyword) %>% 
+    summarise(Count = n()) %>% 
+    arrange(desc(Count))
+
+searchPDF <- pdf_grouped %>%
+   filter(pdf_name == "125742_S1_M5_c4591001-T-S-final-reacto-tables-track.pdf") %>% #hardcoded pdf
+    pull(pdf_name)
+
+pdf_grouped
+```
+
+# Uing Python
+
+```{python include=FALSE}
+# deployment server needs python
+# installing tabula-py (Anaconda)
+# using virutal-env from Anaconda in R Studio Global Options
+import tabula
+import os
+
+#reticulate can pass variables between R and Python
+path = r.directory
+
+pdf = r.searchPDF
+
+searchstring = path + "\\" + pdf
+
+# read PDF file and extract tables
+tables = tabula.read_pdf(searchstring, pages = "all")
+
+# save tables in a folder - each tables get his own sheet
+folder_name = pdf + "-tables"
+if not os.path.isdir(folder_name):
+    os.mkdir(folder_name)
+# iterate over extracted tables and export as excel individually
+for i, table in enumerate(tables, start=1):
+    table.to_excel(os.path.join(folder_name, f"table_{i}.xlsx"), index=False)
+
+```
+
+
+
+```{r}
+library(pdftools)
+library(pdfsearch)
+
+directory <- 'C:\\pdfDirectory'
+
+result <- 
+  keyword_directory(directory
+                    ,keyword = c('cardio','lung')
+                    ,surround_lines = 1
+                    ,full_names = TRUE)
+head(result)
+```
