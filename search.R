@@ -17,6 +17,7 @@ library(dplyr)
 # FUNCTIONS
 # Function to search corpus and return formatted results
 searchPfizerDox <- function(corp.us, sourc.es, srch.term, off.set=50) {
+  browser()
   
   df1 <- corp.us %>% filter(grepl(srch.term, pdf_text)) 
   df2 <- sourc.es
@@ -65,5 +66,128 @@ searchPfizerDox <- function(corp.us, sourc.es, srch.term, off.set=50) {
   else {
     return(NA)
   }
+}
+
+if (F) { # test: dmitry ----
+  
+  
+  
+  # PFIZER.CORPUS <- readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE)
+  # Error in readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE) : 
+  #   unused argument (show_col_types = FALSE)
+
+  
+  PFIZER.CORPUS <- read_csv("corpus-staging.csv") 
+  View(PFIZER.CORPUS)
+  
+  
+  # dtPFIZER.CORPUS <- fread("corpus-staging.csv")
+  dtPFIZER.CORPUS <- PFIZER.CORPUS %>% as.data.table()
+  dtPFIZER.CORPUS[1]$pdf_text
+
+  
+  
+  PFIZER.SOURCES <- PFIZER.CORPUS  %>%
+    group_by(filename) %>%
+    filter(page_num == max(as.numeric(page_num))) 
+  PFIZER.SOURCES[1,]
+  
+  # Reformat the filename
+  PFIZER.SOURCES$filename <- paste0(tools::file_path_sans_ext(PFIZER.SOURCES$filename), ".pdf")  
+  PFIZER.SOURCES$filename <- sub(".-", "", PFIZER.SOURCES$filename)  
+  
+  keyword="female"
+  keyword="fimale" # <- test with this
+  
+  keyword="h.i.v."
+  keyword="hiv"
+  
+  result <- searchPfizerDox(PFIZER.CORPUS, PFIZER.SOURCES, keyword, 100)
+  
+  
+  df1 <- PFIZER.CORPUS %>% filter(grepl(keyword, pdf_text)) 
+  df1
+  df1$pdf_text[1]
+  
+  # %ilike% innstead of grepl ----
+  
+  dt1 <- dtPFIZER.CORPUS[grepl(keyword, pdf_text)];dt1
+  
+  
+  dt1 <- dtPFIZER.CORPUS[
+    pdf_text %ilike% keyword # much faster
+  ];dt1
+  
+  dt1 <- dtPFIZER.CORPUS[
+    pdf_text %ilike% paste0("(?i)", keyword) # case-insensitive
+  ];dt1
+  
+
+  
+  
+  # agrep {base}  ----
+  
+  max.distance=0.1
+  
+  
+  dt1 <- dtPFIZER.CORPUS[
+    agrep(keyword, pdf_text, max.distance = 0.1, costs = NULL,
+                               ignore.case = T, value = FALSE, fixed = TRUE,
+                               useBytes = FALSE)
+    ];dt1
+  dt1 <- dtPFIZER.CORPUS[
+    agrep(keyword, pdf_text, max.distance = 0.2, costs = NULL,
+          ignore.case = T, value = FALSE, fixed = TRUE,
+          useBytes = FALSE)
+  ];dt1 
+  
+
+  # #  phonics Does not work with long texts-----
+  # 
+  # library("phonics")
+  # 
+  # dt1 <- dtPFIZER.CORPUS[
+  #   mra_compare( mra_encode(keyword), mra_encode(pdf_text) )
+  # ];dt1
+  
+  
+  # stringdist ----
+  
+  
+  library(stringdist)
+  
+  # The Optimal String Alignment distance (method=‘osa’) is like the Levenshtein distance but also allows transposition of adjacent characters. Here, each substring may be edited only once. (For example, a character cannot be transposed twice to move it forward in the string).
+  
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword, method="osa",  maxDist=1) 
+  ];dt1; dt1 %>% nrow
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword,  method="osa", maxDist=2) 
+  ];dt1; dt1 %>% nrow
+  
+  
+
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword, method="qgram",  maxDist=5, q=2) 
+  ];dt1; dt1 %>% nrow
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword,  method="qgram", maxDist=2, q=2) 
+  ];dt1; dt1 %>% nrow
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword, method="qgram",  maxDist=5, q=1) 
+  ];dt1; dt1 %>% nrow
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword, method="qgram",  maxDist=5, q=3) 
+  ];dt1; dt1 %>% nrow
+  
+  
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword, method="soundex", maxDist=1) 
+  ];dt1; dt1 %>% nrow
+  dt1 <- dtPFIZER.CORPUS[
+    grabl(pdf_text, keyword, method="soundex", maxDist=2) 
+  ];dt1; dt1 %>% nrow
+  
+
 }
 
