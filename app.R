@@ -55,6 +55,7 @@ if (T) {
 # Error in readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE) : 
 #   unused argument (show_col_types = FALSE)
 
+
 PFIZER.CORPUS <- read_csv("corpus-staging.csv") 
 
 PFIZER.SOURCES <- PFIZER.CORPUS  %>%

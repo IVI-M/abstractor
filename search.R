@@ -75,13 +75,12 @@ if (F) { # test: dmitry ----
   # PFIZER.CORPUS <- readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE)
   # Error in readr::read_csv("corpus-staging.csv", quote = "\"'", show_col_types = FALSE) : 
   #   unused argument (show_col_types = FALSE)
-
   
   PFIZER.CORPUS <- read_csv("corpus-staging.csv") 
   View(PFIZER.CORPUS)
   
-  
   # dtPFIZER.CORPUS <- fread("corpus-staging.csv")
+
   dtPFIZER.CORPUS <- PFIZER.CORPUS %>% as.data.table()
   dtPFIZER.CORPUS[1]$pdf_text
 
