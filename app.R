@@ -1,49 +1,53 @@
-##############################
-# LIBRARIES
+############################# #
+# LIBRARIES ----
 
-# R and Shiny
-library(dplyr)
-library(ggplot2)
-library(shiny)
-library(shinyWidgets)
-library(shinycssloaders)
-library(shinythemes)
-library(shinybusy)
-library(shinyalert)
-library(DT)
+if (T) {
+  # R and Shiny
+  library(dplyr)
+  library(ggplot2)
+  library(shiny)
+  library(shinyWidgets)
+  library(shinycssloaders)
+  library(shinythemes)
+  library(shinybusy)
+  library(shinyalert)
+  library(DT)
+  
+  library(data.table) # replaced CNTR+F data.frame with data.table
+  library(dtplyr)
+  
+  # Wordclouds
+  # SEE: https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
+  library(wordcloud)
+  library(RColorBrewer)
+  
+  # PDF handling
+  library(pdftools)
+  library(pdfsearch)
+  
+  # Text mining and summarisation
+  library(tm)
+  library(lexRankr)
+  
+  # OCR
+  library(tesseract)
+  
+  # Scraping webpages
+  library(tidyverse)
+  library(rvest)
+  
+  # String manipulation
+  library(stringr)
+  library(stringi)
+  
+  # CSV read handling
+  library(readr)
+  
+}
 
-library(data.table) # replaced CNTR+F data.frame with data.table
 
-# Wordclouds
-# SEE: https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
-library(wordcloud)
-library(RColorBrewer)
-
-# PDF handling
-library(pdftools)
-library(pdfsearch)
-
-# Text mining and summarisation
-library(tm)
-library(lexRankr)
-
-# OCR
-library(tesseract)
-
-# Scraping webpages
-library(tidyverse)
-library(rvest)
-
-# String manipulation
-library(stringr)
-library(stringi)
-
-# CSV read handling
-library(readr)
-
-
-##############################
-# DATA
+############################# #
+# DATA ----
 # Read in the corpus
 # User readr version of read_csv to handle EOF in quoted strings
 
@@ -53,8 +57,7 @@ library(readr)
 
 # PFIZER.CORPUS <- data.table("corpus-staging.csv")
 
-PFIZER.CORPUS <- read_csv("corpus-staging.csv")
-
+PFIZER.CORPUS <- read_csv("corpus-staging.csv") 
 
 PFIZER.SOURCES <- PFIZER.CORPUS  %>%
   group_by(filename) %>%
@@ -65,8 +68,8 @@ PFIZER.SOURCES$filename <- paste0(tools::file_path_sans_ext(PFIZER.SOURCES$filen
 PFIZER.SOURCES$filename <- sub(".-", "", PFIZER.SOURCES$filename)  
 
 
-##############################
-# FUNCTIONS
+############################# #
+# FUNCTIONS ----
 
 # Cleaning up strings for regex and escaping reserved characters
 # SEE: https://stackoverflow.com/questions/14836754/is-there-an-r-function-to-escape-a-string-for-regex-characters
@@ -75,8 +78,8 @@ quotemeta <- function(string) {
 }
 
 
-################################################
-# CODE
+############################################### #
+# CODE -----
 
 # Code to press the 'search' button on enter
 # SEE: https://stackoverflow.com/questions/32335951/using-enter-key-with-action-button-in-r-shiny
@@ -124,8 +127,8 @@ button_color_css <- "
 
 "
 
-##############################
-# UI
+############################# #
+# UI -----
 ui <- fluidPage(
   #Navbar structure for UI
   navbarPage("Abstractor: STAGING SERVER", theme = shinytheme("flatly"),
@@ -133,14 +136,14 @@ ui <- fluidPage(
                       tags$style(button_color_css),
                       tags$style("@import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);"),
                       tags$script(type="text/javascript", src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55a2c0ea679e0df1"),
-  
+                      
                       # Google Analytics
                       # tags$head(includeHTML(("google-analytics.html"))),
-
+                      
                       tags$head(tags$link(rel="shortcut icon", href="favicon/database-32-171970.png", sizes="16x16")),
                       tags$head(tags$link(rel="shortcut icon", href="favicon/database-32-171970.png", sizes="32x32")),
                       tags$head(tags$link(rel="canonical", href="https://vaccines.shinyapps.io/abstractor/", sizes="32x32")),
-
+                      
                       # Open Graph
                       tags$head(tags$meta(property="og:title", content="Abstractor - Open Source Text Summarizer/ML project for Pfizer Document Analysis")),
                       tags$head(tags$meta(property="og:site_name", content="Abstractor")),
@@ -148,15 +151,15 @@ ui <- fluidPage(
                       tags$head(tags$meta(property="og:description", content="Search, summarise, analyse and discover information from the Pfizer documents released under FOIA")),
                       tags$head(tags$meta(property="og:type", content="website")),
                       tags$head(tags$meta(property="og:image", content="https://images.unsplash.com/photo-1618961734760-466979ce35b0?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1032&q=80")),
-
+                      
                       # Default search when 'Enter' is pressed
                       # SEE: https://stackoverflow.com/questions/32335951/using-enter-key-with-action-button-in-r-shiny
                       tags$head(tags$script(HTML(js.code.enter))),
-
+                      
                       # Other pre-load setup                      
                       #shinythemes::themeSelector(),
                       add_busy_bar(color = "DodgerBlue", height = "5px"),
-
+                      
                       sidebarLayout(
                         sidebarPanel(
                           width=3,
@@ -190,13 +193,13 @@ ui <- fluidPage(
                           fluidRow(
                             column(
                               htmlOutput("keywordsOutput"), 
-                            width = 10)
+                              width = 10)
                           ),
                           br()
                         )
                       )
              ),
-
+             
              navbarMenu("More", icon = icon("info-circle"),
                         tabPanel("Get Involved", fluid = TRUE,
                                  fluidRow(
@@ -275,29 +278,29 @@ ui <- fluidPage(
   )
 )
 
-##########################################################
-# SERVER
+######################################################### #
+# SERVER ----
 server <- function(input, output, session) {
   # Inline functions
   #source('db.R')
   source('search.R')
   
   #shinyalert(title = "Title", text = "Some text", type = "info")
-
+  
   # Search for keywords from a list of PDFs
   keywordsSearchPDFs <- function() {
-    ####################################################      
-    # Your code goes here
+    ################################################### #      
+    # Your code goes here ----
     #print("keywordsSearchPDFs called")
     
     # Set inputs from UI 
     rVals$keywords_keywords <- input$keywords
-
+    
     # Remove leading and trailing whitespace and split into vector
     keywords <- rVals$keywords_keywords
     keywords <- unlist(strsplit(keywords, ","))
     keywords <- trimws(keywords)
-
+    
     # Do we have any keywords?    
     total.matches <- 0
     total.results <- data.frame()
@@ -308,11 +311,11 @@ server <- function(input, output, session) {
     }
     else {
       showNotification("Searching", closeButton=FALSE, duration = 5)
-
+      
       # Loop through the keywords      
       for(keyword in keywords) {
-          result <- searchPfizerDox(PFIZER.CORPUS, PFIZER.SOURCES, keyword, 100)
-          total.results <- rbind(total.results, result)
+        result <- searchPfizerDox(PFIZER.CORPUS, PFIZER.SOURCES, keyword, 100)
+        total.results <- rbind(total.results, result)
       }
       # This will invalidate the data table and force a redraw
       if(!is.na(total.results[1,])) {
@@ -328,64 +331,64 @@ server <- function(input, output, session) {
     }
   }
   
-
+  
   # Keyword finder tool
   # SEE: https://cran.r-project.org/web/packages/pdfsearch/vignettes/intro_to_pdfsearch.html
   output$keywordsOutput <- renderUI({
-      ####################################################      
-      # Your code goes here
-      #print("keywordsOutput called")
+    ################################################### #      
+    # Your code goes here
+    #print("keywordsOutput called")
     
-      results <- rVals$keywords_results
-
-      # Do we have results?
-      if(results != "") {
-        # Show the datatable
-        # See: https://cran.r-project.org/web/packages/DT/DT.pdf
-        DT::datatable(results,
-                      class='compact', 
-                      #style="jqueryui", 
-                      selection = "none",
-                      rownames = FALSE, 
-                      escape = FALSE, 
-                      width = "120%",
-                      height = 400,
-                      filter = 'bottom', #Position of column filters
-                      extensions = 'Buttons', 
-                      options = list(ordering=F, 
-                                     language = list(search = 'Filter:'),
-                                     initComplete = JS(
-                                       "function(settings, json) {",
-                                       "$(this.api().table().header()).css({'background-color': '#2C3E50', 'color': '#fff'});",
-                                       "}"
-                                     ),
-                                     displayLength=10,  #Records to show/page
-                                     lengthChange = 1,  #Show/hide records/page
-                                     dom = 'Blfrtip',   #Reqiured for buttons
-                                     buttons = c('copy', 'csv', 'excel', 'print'),
-                                     searchHighlight = TRUE
-                      ),
-                      colnames = c("Keyword" = "keyword", "Filename" = "filename", "Page" = "page_num", "Source" = "source", "Extract" = "extract")
-        )
-      }
-      else {
-        HTML("<hr><i>Results will appear here...</i>")
-      }
+    results <- rVals$keywords_results
+    
+    # Do we have results?
+    if(results != "") {
+      # Show the datatable
+      # See: https://cran.r-project.org/web/packages/DT/DT.pdf
+      DT::datatable(results,
+                    class='compact', 
+                    #style="jqueryui", 
+                    selection = "none",
+                    rownames = FALSE, 
+                    escape = FALSE, 
+                    width = "120%",
+                    height = 400,
+                    filter = 'bottom', #Position of column filters
+                    extensions = 'Buttons', 
+                    options = list(ordering=F, 
+                                   language = list(search = 'Filter:'),
+                                   initComplete = JS(
+                                     "function(settings, json) {",
+                                     "$(this.api().table().header()).css({'background-color': '#2C3E50', 'color': '#fff'});",
+                                     "}"
+                                   ),
+                                   displayLength=10,  #Records to show/page
+                                   lengthChange = 1,  #Show/hide records/page
+                                   dom = 'Blfrtip',   #Reqiured for buttons
+                                   buttons = c('copy', 'csv', 'excel', 'print'),
+                                   searchHighlight = TRUE
+                    ),
+                    colnames = c("Keyword" = "keyword", "Filename" = "filename", "Page" = "page_num", "Source" = "source", "Extract" = "extract")
+      )
+    }
+    else {
+      HTML("<hr><i>Results will appear here...</i>")
+    }
   })
   
   
-
-
-  # -------------------------
-  # observe event for updating reactiveValues
+  
+  
+  # ----------------------- --
+  # observe event for updating reactiveValues -----
   observeEvent(input$keyword_search_btn,
-  {
-    #print("keyword_search_btn called")
-    keywordsSearchPDFs()
-  })
+               {
+                 #print("keyword_search_btn called")
+                 keywordsSearchPDFs()
+               })
   
-
-  # -------------------------
+  
+  # ------------------------ -
   # See: https://riptutorial.com/shiny/example/32342/reactivevalues
   rVals <- reactiveValues(
     keywords_keywords="",                       # Keywords tool
@@ -394,4 +397,6 @@ server <- function(input, output, session) {
 }
 
 # Run the application
+# options(shiny.host='127.0.0.1')
+# options(shiny.port= 2022 )
 shinyApp(ui = ui, server = server)
